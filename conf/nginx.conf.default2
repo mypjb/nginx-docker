@@ -1,0 +1,54 @@
+user root;
+#worker processes
+worker_processes 2;
+
+#global error log
+error_log logs/error.log debug;
+
+events {
+	#worker connections current 1024
+	worker_connections 1024;
+} 
+
+
+http {
+	#include mime type
+	include mime.types;
+
+	#definition default type
+	default_type application/octet-stream;
+
+	#definition main log format
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+	#enable sendfile server
+	sendfile on;
+
+        #keepalive connection timeoutt 65
+	keepalive_timeout 65;
+
+        #enable gzip
+	gzip on;	
+
+	#include http config
+	include http/*.conf;
+
+        error_page 404 /404.html;
+
+#        error_page   500 502 503 504  /50x.html;
+#        location = /50x.html {
+#            root   html;
+#        }
+
+
+}
+
+#stream config
+
+stream {
+
+include stream/*.conf;
+
+}
