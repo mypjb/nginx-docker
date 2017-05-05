@@ -6,7 +6,7 @@ MAINTAINER NGINX Docker Maintainers "280417314@qq.com"
 ENV NGINX_URL http://nginx.org/download/nginx-1.12.0.tar.gz
 
 #nginx install file  dir
-ENV NGINX_PACKAGE_PATH /usr/local/src/nginx
+ENV NGINX_PACKAGE_PATH /usr/local/package/nginx
 
 #nginx default install dir
 ENV NGINX_PATH /usr/local/nginx
@@ -17,8 +17,7 @@ ENV NGINX_DEPEND pcre-devel \
 		 gd-devel 
 
 #nginx install confiure
-ENV NGINX_CONFIGURE --with-stream \
-		    --with-http_image_filter_module
+ENV NGINX_CONFIGURE --with-stream
 
 ENV BIN_PATH /docker/bin
 
@@ -26,7 +25,7 @@ ENV BIN_FILE docker-entrypoint.sh
 
 RUN yum update -y
 
-RUN yum install -y gcc make wget \
+RUN yum install -y gcc make wget net-tools \
 	&& yum install -y $NGINX_DEPEND \
 	&& wget $NGINX_URL -O nginx.tar.gz \ 
 	&& mkdir -p $NGINX_PACKAGE_PATH \
@@ -38,15 +37,7 @@ RUN yum install -y gcc make wget \
 	&& make install \
 	&& ln -s $NGINX_PATH/sbin/nginx /usr/local/bin
 
-RUN mkdir -p $BIN_PATH
-
-COPY $BIN_FILE $BIN_PATH
-
-RUN ln -s $BIN_PATH/$BIN_FILE /usr/local/bin
-
-
-ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 80
 
-#CMD ["nginx","-g","daemon off;"]
+CMD nginx ; /bin/bash;
