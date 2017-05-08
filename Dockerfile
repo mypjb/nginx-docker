@@ -2,6 +2,9 @@ FROM centos
 
 MAINTAINER NGINX Docker Maintainers "280417314@qq.com"
 
+#nginx config git
+ENV NGINX_GIT https://github.com/mypjb/nginx-docker.git
+
 #nginx install file
 ENV NGINX_URL http://nginx.org/download/nginx-1.12.0.tar.gz
 
@@ -19,13 +22,9 @@ ENV NGINX_DEPEND pcre-devel \
 #nginx install confiure
 ENV NGINX_CONFIGURE --with-stream
 
-ENV BIN_PATH /docker/bin
-
-ENV BIN_FILE docker-entrypoint.sh
-
 RUN yum update -y
 
-RUN yum install -y gcc make wget net-tools \
+RUN yum install -y gcc make wget net-tools git \
 	&& yum install -y $NGINX_DEPEND \
 	&& wget $NGINX_URL -O nginx.tar.gz \ 
 	&& mkdir -p $NGINX_PACKAGE_PATH \
@@ -35,7 +34,10 @@ RUN yum install -y gcc make wget net-tools \
 	&& ./configure $NGINX_CONFIGURE \
 	&& make \
 	&& make install \
-	&& ln -s $NGINX_PATH/sbin/nginx /usr/local/bin
+	&& ln -s $NGINX_PATH/sbin/nginx /usr/local/bin \
+	&& mkdir nginx_git \
+	&& git clone $NGINX_GIT nginx_git \
+	&& cp -rf nginx_git/conf/* $NGINX_PATH/conf
 
 
 EXPOSE 80
